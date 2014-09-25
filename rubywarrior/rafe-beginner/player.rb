@@ -9,6 +9,7 @@ class Player
     @action_taken = false
 
     check_for_rest unless @action_taken
+    check_for_ranged unless @action_taken
     check_for_walk unless @action_taken
     check_for_captive unless @action_taken
     check_direction unless @action_taken
@@ -17,40 +18,56 @@ class Player
     @current_health = @warrior.health
   end
 
+  def check_for_ranged
+    path = @warrior.look(@direction)
+    return unless path.any?(&:enemy?)
+
+    if shot_clear?(path)
+      @warrior.shoot!
+      @action_taken = true
+    end
+  end
+
+  def shot_clear?(path)
+    enemy_space = path.index { |space| space.enemy? == true }
+    captive_space = path.index { |space| space.captive? == true } || 4
+    captive_space > enemy_space
+  end
+
   def check_for_rest
-    if @warrior.feel(@direction).empty?
-      if @warrior.health < MAX_HEALTH && !taking_damage?
-        @warrior.rest!
+    return unless @warrior.feel(@direction).empty?
+
+    if @warrior.health < MAX_HEALTH && !taking_damage?
+      @warrior.rest!
+      @action_taken = true
+    else
+      if wounded?(15)
+        @warrior.walk!(:backward)
         @action_taken = true
-      else
-        if wounded?(15)
-          @warrior.walk!(:backward)
-          @action_taken = true
-        end
       end
     end
   end
 
   def check_for_walk
-    if @warrior.feel(@direction).empty?
-      @warrior.walk!(@direction)
-      @action_taken = true
-    end
+    return unless @warrior.feel(@direction).empty?
+
+    @warrior.walk!(@direction)
+    @action_taken = true
   end
 
   def check_for_captive
-    if @warrior.feel(@direction).captive?
-      @warrior.rescue!(@direction)
-      @action_taken = true
-    end
+    return unless @warrior.feel(@direction).captive?
+
+    @warrior.rescue!(@direction)
+    @action_taken = true
   end
 
   def check_direction
-    if @warrior.feel(@direction).wall?
-      @warrior.pivot!
-      @action_taken = true
-      # @direction = DIRECTIONS.fetch(DIRECTIONS.index(@direction) + 1)
-    end
+    return unless @warrior.feel(@direction).wall?
+
+    @warrior.pivot!
+    @action_taken = true
+    # @direction = DIRECTIONS.fetch(DIRECTIONS.index(@direction) + 1)
   end
 
   def check_attack
