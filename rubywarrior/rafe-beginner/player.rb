@@ -9,7 +9,7 @@ class Player
 
     check_for_rest unless @action_taken
     check_for_walk unless @action_taken
-    # check_for_captive unless @action_taken
+    check_for_captive unless @action_taken
     check_direction unless @action_taken
     check_attack unless @action_taken
 
@@ -22,12 +22,10 @@ class Player
         @warrior.rest!
         @action_taken = true
       else
-        @warrior.walk!
-        @action_taken = true
-        # if wounded?(15)
-        #   @warrior.walk!(:backward)
-        #   @action_taken = true
-        # end
+        if wounded?(15)
+          @warrior.walk!(:backward)
+          @action_taken = true
+        end
       end
     end
   end
