@@ -42,7 +42,7 @@ class Player
       @warrior.rest!
       @action_taken = true
     else
-      if wounded?(15)
+      if wounded?(12)
         @warrior.walk!(:backward)
         @action_taken = true
       end
