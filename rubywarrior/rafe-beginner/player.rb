@@ -1,6 +1,7 @@
 class Player
   MAX_HEALTH = 20
-  DIRECTIONS = [:forward, :backward]
+  # DIRECTIONS = [:forward, :backward]
+  DIRECTIONS = [:backward, :forward]
 
   def play_turn(warrior)
     @direction = DIRECTIONS.fetch(0) unless @direction
@@ -48,6 +49,7 @@ class Player
     if @warrior.feel(@direction).wall?
       @warrior.pivot!
       @action_taken = true
+      # @direction = DIRECTIONS.fetch(DIRECTIONS.index(@direction) + 1)
     end
   end
 
@@ -57,7 +59,7 @@ class Player
   end
 
   def taking_damage?
-    if @warrior.health < (@current_health || 20)
+    if @warrior.health < (@current_health || MAX_HEALTH)
       true
     else
       false
