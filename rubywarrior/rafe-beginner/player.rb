@@ -8,8 +8,8 @@ class Player
     @warrior = warrior
     @action_taken = false
 
-    check_for_rest unless @action_taken
     check_for_ranged unless @action_taken
+    check_for_rest unless @action_taken
     check_for_walk unless @action_taken
     check_for_captive unless @action_taken
     check_direction unless @action_taken
@@ -20,18 +20,19 @@ class Player
 
   def check_for_ranged
     path = @warrior.look(@direction)
-    return unless path.any?(&:enemy?)
 
-    if shot_clear?(path)
-      @warrior.shoot!
-      @action_taken = true
-    end
+    return unless path.any?(&:enemy?)
+    return unless shot_clear?(path)
+    return unless path.fetch(0).empty?
+
+    @warrior.shoot!
+    @action_taken = true
   end
 
   def shot_clear?(path)
     enemy_space = path.index { |space| space.enemy? == true }
     captive_space = path.index { |space| space.captive? == true } || 4
-    captive_space > enemy_space
+    captive_space > enemy_space && !taking_damage?
   end
 
   def check_for_rest
