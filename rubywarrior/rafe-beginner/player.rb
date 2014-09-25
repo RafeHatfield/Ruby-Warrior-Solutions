@@ -1,7 +1,7 @@
 class Player
   MAX_HEALTH = 20
-  # DIRECTIONS = [:forward, :backward]
-  DIRECTIONS = [:backward, :forward]
+  DIRECTIONS = [:forward, :backward]
+  # DIRECTIONS = [:backward, :forward]
 
   def play_turn(warrior)
     @direction = DIRECTIONS.fetch(0) unless @direction
